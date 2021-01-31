@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TodoList-Vue</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/todomvc-app-css@2.3.0/index.css">
+</head>
+
+<body>
+  <div id="app">
+    <section class="todoapp">
+      <header>
+        <h1>Todo List</h1>
+      </header>
+      <input v-model="newTodo" v-on:keyup.enter="addTodo" type="text" class="new-todo" autofocus placeholder="需要做什麼？" />
+      <main class="main" v-show="todos.length">
+        <input id="toggle-all" type="checkbox" class="toggle-all" />
+        <label for="toggle-all"></label>
+        <ul class="todo-list">
+          <li v-for="todo in filteredTodos" v-bind:key="todo.id" class="todo" v-bind:class="{completed:todo.completed}">
+            <div class="view">
+              <input type="checkbox" class="toggle" v-on:click="finished(todo, $event)" />
+              <label for="">{{todo.title}}</label>
+              <button v-on:click="removeTodo(todo)" class="destroy"></button>
+            </div>
+            <input type="text" class="edit" />
+          </li>
+        </ul>
+      </main>
+      <footer class="footer" v-show="todos.length">
+        <span class="todo-count"> <strong> {{ remaining }} </strong> {{ remaining | pluralize }} left </span>
+        <ul class="filters">
+          <li>
+            <a href="#/all" v-on:click="setVisibility('all')" v-bind:class="{ selected: visibility === 'all' }">All</a>
+          </li>
+          <li>
+            <a href="#/active" v-on:click="setVisibility('active')"
+              v-bind:class="{ selected: visibility === 'active' }">Active</a>
+          </li>
+          <li>
+            <a href="#/completed" v-on:click="setVisibility('completed')"
+              v-bind:class="{ selected: visibility === 'completed' }">Completed</a>
+          </li>
+        </ul>
+        <button class="clear-completed" v-on:click="clearCompleted">
+          Clear completed
+        </button>
+      </footer>
+    </section>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+  <script src="https://unpkg.com/uuid@latest/dist/umd/uuidv4.min.js"></script>
+  <script type="text/javascript" src="app.js"></script>
+  <!-- <script>
+    const filters = {
+      all: (todos) => todos,
+      active: (todos) => todos.filter((todo) => !todo.completed),
+      completed: (todos) => todos.filter((todo) => todo.completed)
+    };
+
+    new Vue({
+      el: "#app",
+      data: {
+        newTodo: "",
+        todos: [
+          {
+            id: uuidv4(),
+            title: "學習 Vue Template 的使用",
+            completed: true
+          },
+          {
+            id: uuidv4(),
+            title: "學習在 Vue Template 中進行條件判斷",
+            completed: false
+          },
+          {
+            id: uuidv4(),
+            title: "學習在 Vue Template 中使用迴圈",
+            completed: false
+          }
+        ],
+        visibility: "all"
+      },
+      methods: {
+        addTodo() {
+          console.log("addTodo");
+          //如果沒有資料，就離開函式
+          const title = this.newTodo && this.newTodo.trim();
+          if (!title) {
+            return;
+          }
+
+          //  把 newTodo 放到 todos
+          this.todos.push({
+            id: uuidv4(),
+            title,
+            completed: false
+          });
+          //newTodo 的內容清空
+          this.newTodo = "";
+        },
+        removeTodo(todo) {
+          this.todos = this.todos.filter((_todo) => _todo.id !== todo.id);
+        },
+        setVisibility(visibility) {
+          this.visibility = visibility;
+        },
+        removeCompleted() {
+          this.todos = filters.active(this.todos);
+        }
+      },
+      computed: {
+        filteredTodos() {
+          return filters[this.visibility](this.todos);
+        },
+        remaining() {
+          console.log("active: ", filters.active(this.todos));
+          return filters.active(this.todos).length;
+        }
+      },
+      filters: {
+        pluralize(n) {
+          return n === 1 ? "item" : "items";
+        }
+      }
+    });
+  </script> -->
+</body>
+
+</html>
