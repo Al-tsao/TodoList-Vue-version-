@@ -1,3 +1,5 @@
+const STORAGE_KEY = 'todomvc-app-vue'
+
 const filters = {
   all: (todos) => todos,
   active: (todos) => todos.filter(todo => !todo.completed),
@@ -12,7 +14,7 @@ new Vue({
       {
         id: uuidv4(),
         title: '學習 Vue Template 的使用',
-        completed: false,
+        completed: true,
       },
       {
         id: uuidv4(),
@@ -25,6 +27,7 @@ new Vue({
         completed: false,
       },
     ],
+    currentEditTodo: {},
     visibility: 'all',
   },
   methods: {
@@ -43,25 +46,30 @@ new Vue({
     removeTodo(todo) {
       this.todos = this.todos.filter(_todo => _todo.id !== todo.id)
     },
-    finished(todo, event) {
-      this.todos.forEach(element => {
-        if (element.id === todo.id) {
-          /* 方法一: 用classList.toggle */
-          // event.target.parentElement.parentElement.classList.toggle('completed')
-          /* 方法二: 直接修改Vue中的data */
-          if (element.completed) {
-            element.completed = false
-          } else {
-            element.completed = true
-          }
+    editTodo(todo) {
+      this.currentEditTodo = { ...todo }
+    },
+    doneEdit() {
+      this.todos = this.todos.map(todo => {
+        if (todo.id === this.currentEditTodo.id) {
+          return { ...this.currentEditTodo }
+        } else {
+          return todo
         }
-      });
+      }).filter(todo => todo.title.trim())
+      this.currentEditTodo = {}
+    },
+    cancelEdit() {
+      this.currentEditTodo = {}
     },
     setVisibility(visibility) {
       this.visibility = visibility;
     },
     clearCompleted() {
       this.todos = filters.active(this.todos)
+    },
+    saveStorage() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.todos))
     }
   },
   computed: {
@@ -70,6 +78,28 @@ new Vue({
     },
     remaining() {
       return filters.active(this.todos).length;
+    },
+    allDone: {
+      get() {
+        return this.remaining === 0
+      },
+      set(value) {
+        this.todos = this.todos.map((todo) => {
+          if (value === true) {
+            // 全部勾選：將 todos 裡所有項目的 completed 設為 true
+            return {
+              ...todo,
+              completed: true
+            }
+          } else {
+            // 取消勾選：將 todos 裡所有項目的 completed 設為 false
+            return {
+              ...todo,
+              completed: false
+            }
+          }
+        })
+      }
     }
   },
   filters: {
@@ -77,4 +107,22 @@ new Vue({
       return n === 1 ? "item" : "items";
     }
   },
+  watch: {
+    todos: {
+      handler: function () {
+        this.saveStorage()
+      },
+      deep: true,
+    }
+  },
+  created() {
+    this.todos = JSON.parse(localStorage.getItem(STORAGE_KEY) || [])
+  },
+  directives: {
+    'todo-focus': function (el, binding) {
+      if (binding.value) {
+        el.focus()
+      }
+    }
+  }
 })

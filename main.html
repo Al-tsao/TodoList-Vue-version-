@@ -16,16 +16,19 @@
       </header>
       <input v-model="newTodo" v-on:keyup.enter="addTodo" type="text" class="new-todo" autofocus placeholder="需要做什麼？" />
       <main class="main" v-show="todos.length">
-        <input id="toggle-all" type="checkbox" class="toggle-all" />
+        <input id="toggle-all" type="checkbox" class="toggle-all" v-model="allDone" />
         <label for="toggle-all"></label>
         <ul class="todo-list">
-          <li v-for="todo in filteredTodos" v-bind:key="todo.id" class="todo" v-bind:class="{completed:todo.completed}">
+          <li v-for="todo in filteredTodos" v-bind:key="todo.id" class="todo"
+            v-bind:class="{completed: todo.completed, editing: todo.id === currentEditTodo.id}">
             <div class="view">
-              <input type="checkbox" class="toggle" v-on:click="finished(todo, $event)" />
-              <label for="">{{todo.title}}</label>
+              <input v-model="todo.completed" class="toggle" type="checkbox" />
+              <label style="white-space: pre" v-on:dblclick="editTodo(todo)" for="">{{todo.title}}</label>
               <button v-on:click="removeTodo(todo)" class="destroy"></button>
             </div>
-            <input type="text" class="edit" />
+            <input type="text" v-todo-focus="todo.id === currentEditTodo.id" class="edit"
+              v-model="currentEditTodo.title" v-on:keyup.esc="cancelEdit" v-on:keyup.enter="doneEdit"
+              v-on:keyup.blur="doneEdit" />
           </li>
         </ul>
       </main>
